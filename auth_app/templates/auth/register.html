@@ -1,0 +1,95 @@
+{% extends 'layouts/app.html' %}
+
+{% block content %}
+
+<div class="row justify-content-center">
+    <div class="col-sm-6">
+        <h2 class="text-muted">Register</h2>
+        <div>
+            <button id="student-btn" class="btn btn-primary">I'm a Student</button>
+            <button id="teacher-btn" class="btn btn-secondary">I'm a Teacher</button>
+        </div>
+        <form id="student-registration-form" method="POST" action="{% url 'student_register' %}" style="display: none;">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="first_name">First Name:</label>
+                <input type="text" name="first_name" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label for="last_name">Last Name:</label>
+                <input type="text" name="last_name" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label for="degree">Degree:</label>
+                <input type="text" name="degree" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label for="major">Major:</label>
+                <input type="text" name="major" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label for="roll_number">Roll Number:</label>
+                <input type="text" name="roll_number" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" name="email" class="form-control" />
+            </div>    
+            <div class="form-group">
+                <label for="username">Username:</label>
+                <input type="text" name="username" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" name="password" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label for="image">Upload Image:</label>
+                <input type="file" name="image" accept="image/jpeg, image/jpg" class="form-control-file" />
+            </div>
+            <button type="submit" class="btn btn-dark">Save</button>
+        </form>
+
+        <!-- Teacher registration-->
+        <form id='teacher-registration-form' method="POST" action="{% url 'teacher_register' %}">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="{{ form.username.id_for_label}}">Username:</label>
+                <input type="text" name="{{ form.username.name }}" class="form-control" value="{{ form.username.value}}" />
+                {% if form.username.errors %}
+                <span class="text-danger">{{ form.username.errors }}</span>
+                {% endif %}
+            </div>
+
+            
+            <div class="form-group">
+                <label for="{{ form.password1.id_for_label}}">Password:</label>
+                <input type="password" name="{{ form.password1.name }}" class="form-control" value="{{ form.password1.value}}" />
+                <span class="text-danger">{{ form.password1.errors }}</span>
+            </div>
+            <div class="form-group">
+                <label for="{{ form.password2.id_for_label}}">Re-Type Password:</label>
+                <input type="password" name="{{ form.password2.name }}" class="form-control" value="{{ form.password2.value}}" />
+                <span class="text-danger">{{ form.password2.errors }}</span>
+            </div>
+
+            <button type="submit" class="btn btn-dark">Submit</button>
+
+            <a href="{% url 'login' %}" class="btn btn-default">Login</a>
+
+        </form>
+    </div>
+</div>
+
+<script>
+    document.getElementById("student-btn").addEventListener("click", function() {
+        document.getElementById("student-registration-form").style.display = "block";
+        document.getElementById("teacher-registration-form").style.display = "none";
+    });
+
+    document.getElementById("teacher-btn").addEventListener("click", function() {
+        document.getElementById("student-registration-form").style.display = "none";
+        document.getElementById("teacher-registration-form").style.display = "block";
+    });
+</script>
+{% endblock %}
