@@ -1,3 +1,4 @@
+import logging
 from django.shortcuts import render, redirect
 from django.contrib.auth.forms import UserCreationForm,AuthenticationForm
 from django.contrib.auth import login, logout
@@ -24,7 +25,7 @@ def my_view(request):
             return HttpResponse("User is neither a student nor a teacher")
 
 
-''''
+
 class StudentRegistrationForm(forms.ModelForm):
     # Define form fields here
     username = forms.CharField(max_length=100)
@@ -41,18 +42,18 @@ class StudentRegistrationForm(forms.ModelForm):
         if User.objects.filter(username=username).exists():
             raise forms.ValidationError("This username is already taken.")
         return username
-    '''
+    
 # Your views can then use this form for registration or other purposes
 @guest
 def register_student(request):
     if request.method == 'POST':
-        form = Student(request.POST)
+        form = StudentRegistrationForm(request.POST)
         if form.is_valid():
             form.save()
             messages.success(request, 'Account created successfully.')
             return redirect('login')  # Redirect to a success page
     else:
-        form = Student()
+        form = StudentRegistrationForm()
     return render(request, 'auth/register.html', {'form': form})    
 ''''
 #GENERAL REGISTRATION PAGE
@@ -116,6 +117,18 @@ def login_view(request):
 @auth
 
 def student_dashboard(request):
+    logger = logging.getLogger(__name__)
+    logger.debug("Entering student_dashboard view")
+    
+    if not request.user.is_authenticated:
+        logger.warning("User not authenticated, redirecting to login")
+        return redirect('login')
+    try:
+        student = Student.objects.get(user=request.user)
+        logger.debug(f"Student found: {student}")
+        return render(request, 'auth/student_dashboard.html', {'student': student})
+    except Student.DoesNotExist:
+        logger.error("No student associated with this user")
     user = request.user
     if user.is_authenticated:
         try:
@@ -124,11 +137,41 @@ def student_dashboard(request):
         except Student.DoesNotExist:
             pass
 
+        logger.error("Student object does not exist for the user")
+        return HttpResponse("Student not found", status=404)
 
+    # Any other logic and a final return statement
+    logger.debug("Exiting student_dashboard view")
+    return HttpResponse("Some default response or error page")
 
+@auth
 
+def teacher_dashboard(request):
+    logger = logging.getLogger(__name__)
+    logger.debug("Entering teacher_dashboard view")
+    if not request.user.is_authenticated:
+        logger.warning("User not authenticated, redirecting to login")
+        return redirect('login')
+    try:
+        teacher = Teacher.objects.get(user=request.user)
+        logger.debug(f"Teacher found: {teacher}")
+        return render(request, 'auth/teacher_dashboard.html', {'teacher': teacher})
+    except Teacher.DoesNotExist:
+        logger.error("No teacher associated with this user")
+    user = request.user
+    if user.is_authenticated:
+        try:
+            teacher = Teacher.objects.get(user=user)
+            return render(request, 'auth/teacher_dashboard.html')
+        except Teacher.DoesNotExist:
+            pass
 
+        logger.error("Teacher object does not exist for the user")
+        return HttpResponse("Teacher not found", status=404)
 
+    # Any other logic and a final return statement
+    logger.debug("Exiting teacher_dashboard view")
+    return HttpResponse("Some default response or error page")
 
 # LOGOUT 
 

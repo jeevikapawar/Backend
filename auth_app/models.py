@@ -9,7 +9,9 @@ class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)'''
     
 class Teacher(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    FirstName = models.CharField(max_length=100, default='unknown')
+    LastName = models.CharField(max_length=100, default='Unknown')
     # Add other teacher fields as needed
 class Class(models.Model):
     name = models.CharField(max_length=100)
